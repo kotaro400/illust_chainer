@@ -1,9 +1,21 @@
 import React from 'react';
 import { Modal, Form, Input } from 'antd';
+import styled from "styled-components";
+
+const inputStyle: React.CSSProperties = {
+  fontSize: "18px", 
+  backgroundColor: "#f6f6f6", 
+  borderRadius: "5px"
+};
+
+const FormText = styled.p`
+  color: #666666;
+  font-size: 13px;
+  margin: 0;
+`;
 
 interface Values {
   title: string;
-  creater: string;
 };
 
 interface Props {
@@ -20,9 +32,11 @@ const NewPictureInputModal: React.FC<Props> = (props) => {
   return (
     <Modal
       visible={visible}
-      title="絵しりとり #1"
-      okText="回答する"
+      title="絵しりとり 2枚目"
+      okText="投稿する"
       cancelText="キャンセル"
+      okButtonProps={{shape: "round"}}
+      cancelButtonProps={{shape: "round"}}
       onCancel={onCancel}
       onOk={() => {
         form.validateFields()
@@ -35,12 +49,12 @@ const NewPictureInputModal: React.FC<Props> = (props) => {
       <Form
         form={form}
         layout="vertical"
-        name="picture-input"
-        
+        name="picture-input" 
       >
+        <FormText>何を描きましたか？</FormText>
         <Form.Item 
           name="title" 
-          label="題名（ひらがなのみ）"
+          required={false}
           rules={[
             {
               required: true,
@@ -52,11 +66,10 @@ const NewPictureInputModal: React.FC<Props> = (props) => {
             }
           ]}
         >
-          <Input style={{fontSize: "18px"}}/>
+          <Input style={inputStyle}/>
         </Form.Item>
-        <Form.Item name="creater" label="作者">
-          <Input style={{fontSize: "18px"}}/>
-        </Form.Item>
+        <FormText>＊これを使ってしりとりが成功したか判定します</FormText>
+        <FormText>＊ひらがなと「ー」のみで入力してください</FormText>
       </Form>
     </Modal>
   );

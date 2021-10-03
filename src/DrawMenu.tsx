@@ -1,15 +1,30 @@
 import { Dropdown, Menu } from 'antd';
-import { BsFillCircleFill } from "react-icons/bs";
-import { FaEraser, FaPen, FaUndoAlt } from "react-icons/fa";
+import { BsFillCircleFill, BsCircle } from "react-icons/bs";
+import { FaUndoAlt } from "react-icons/fa";
+import { BiPencil, BiEraser } from "react-icons/bi";
 import ColorPicker from "react-pick-color";
+import styled from "styled-components";
+
+const DrawMenuComponent = styled.div`
+  display: flex;
+  justify-content: space-around; 
+  padding: 20px 0;
+  height: 65px;
+  width: 100%;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  background-color: #fff;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+`;
 
 interface Props {
   color: string;
   changeColor: (color: string) => void;
   width: number;
-  changeWidth: (width: number) => void;
   tool: "pen" | "eraser";
-  changeTool: (tool: "pen" | "eraser") => void;
+  changePen: (width: number) => void;
+  changeEraser: (width: number) => void;
   undo: () => void;
 }
 
@@ -27,30 +42,33 @@ const renderColorPicker = (color: string, changeColor: (color: string) => void) 
   </div>
 );
 
-const renderWidthMenu = (width: number, changeWidth: (width: number) => void) => {
+const renderPenMenu = (width: number, color: string, changePen: (width: number) => void) => {
   return(
-    <Menu onClick={({key}) => changeWidth(Number(key))} selectedKeys={[String(width)]}>
-      <Menu.Item key="2" style={{...itemStyle}}>
-        2px
+    <Menu onClick={({key}) => changePen(Number(key))} selectedKeys={[String(width)]}>
+      <Menu.Item key="2" style={{...itemStyle}} icon={<BsFillCircleFill style={{"fontSize": "2px", "color": color}}/>}>
+        2.0
       </Menu.Item>
-      <Menu.Item key="5" style={{...itemStyle}}>
-        5px
+      <Menu.Item key="5" style={{...itemStyle}} icon={<BsFillCircleFill style={{"fontSize": "5px", "color": color}}/>}>
+        5.0
       </Menu.Item>
-      <Menu.Item key="10" style={{...itemStyle}}>
-        10px
+      <Menu.Item key="10" style={{...itemStyle}} icon={<BsFillCircleFill style={{"fontSize": "10px", "color": color}}/>}>
+        10.0
       </Menu.Item>
     </Menu>
   )
 };
 
-const renderToolMenu = (tool: string, changeTool: (tool: "pen" | "eraser") => void) => {
+const renderEraserMenu = (width: number, changeEraser: (width: number) => void) => {
   return(
-    <Menu onClick={({key}) => changeTool(key as "pen" | "eraser")} selectedKeys={[tool]}>
-      <Menu.Item key="pen" style={itemStyle}>
-        ペン
+    <Menu onClick={({key}) => changeEraser(Number(key))} selectedKeys={[String(width)]}>
+      <Menu.Item key="2" style={{...itemStyle}} icon={<BsCircle style={{"fontSize": "2px"}}/>}>
+        2.0
       </Menu.Item>
-      <Menu.Item key="eraser" style={itemStyle}>
-        消しゴム
+      <Menu.Item key="5" style={{...itemStyle}} icon={<BsCircle style={{"fontSize": "5px"}}/>}>
+        5.0
+      </Menu.Item>
+      <Menu.Item key="10" style={{...itemStyle}} icon={<BsCircle style={{"fontSize": "10px"}}/>}>
+        10.0
       </Menu.Item>
     </Menu>
   )
@@ -58,27 +76,18 @@ const renderToolMenu = (tool: string, changeTool: (tool: "pen" | "eraser") => vo
 
 const DrawMenu = (props: Props) => {
   return(
-    <div style={{"display": "flex", "justifyContent": "space-around", "padding": "20px 0"}}>
+    <DrawMenuComponent>
+      <Dropdown overlay={renderPenMenu(props.width, props.color, props.changePen)} trigger={["click"]} placement="topCenter">
+        <BiPencil className="icon" style={{"fontSize": "30px"}}/>
+      </Dropdown>
+      <Dropdown overlay={renderEraserMenu(props.width, props.changeEraser)} trigger={['click']} placement="topCenter">
+        <BiEraser style={{"fontSize": "30px"}}/>
+      </Dropdown>
       <Dropdown overlay={renderColorPicker(props.color, props.changeColor)} trigger={['click']} placement="topCenter">
         <BsFillCircleFill style={{"fontSize": "30px", "color": props.color}}/>
       </Dropdown>
-      <Dropdown overlay={renderWidthMenu(props.width, props.changeWidth)} trigger={["click"]} placement="topCenter">
-        <div style={{"width": "30px", "height": "30px", "padding": `0 ${(30 - props.width) / 2}px`}}>
-          <div style={{
-            "height": "30px", 
-            "width": `${props.width}px`, 
-            "backgroundColor": props.color, 
-            "borderRadius": `${props.width * 0.4}px`
-            }}/>
-        </div>
-      </Dropdown>
-      <Dropdown overlay={renderToolMenu(props.tool, props.changeTool)} trigger={['click']} placement="topCenter">
-        {
-          props.tool === "pen" ? <FaPen style={{"fontSize": "30px"}}/> : <FaEraser style={{"fontSize": "30px"}}/> 
-        } 
-      </Dropdown>
       <FaUndoAlt style={{"fontSize": "30px"}} onClick={props.undo}/> 
-    </div>
+    </DrawMenuComponent>
   )
 };
 

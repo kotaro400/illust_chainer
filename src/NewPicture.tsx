@@ -1,9 +1,21 @@
 import { useRef, useState } from "react";
-import { Layer, Stage, Line } from "react-konva";
+import { Layer, Stage, Line, Rect } from "react-konva";
 import Konva from "konva";
+import styled from "styled-components";
 import DrawMenu from "./DrawMenu";
 import NewPictureHeader from "./NewPictureHeader";
 import NewPictureInputModal from "./NewPictureInputModal";
+
+const NewPictureComponent = styled.div`
+  background-color: #f8f8fa;
+  min-height: 100vh;
+  p {
+    font-size: 24px;
+    text-align: center;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+`;
 
 interface LineType {
   points: number[];
@@ -47,17 +59,28 @@ const NewPicture = () => {
     setLines(lines.slice(0, lines.length - 1));    
   };
 
+  const changePen = (width: number) => {
+    setTool("pen");
+    setWidth(width);
+  };
+
+  const changeEraser = (width: number) => {
+    setTool("eraser");
+    setWidth(width);
+  };
+
   return (
-    <div>
+    <NewPictureComponent>
       <NewPictureHeader onComplete={() => setVisible(true)} />
       <NewPictureInputModal
         visible={visible}
         onCreate={() => setVisible(false)}
         onCancel={() => setVisible(false)}
       />
+      <p>2枚目</p>
       <Stage
         width={300}
-        height={450}
+        height={400}
         onMouseDown={handleMouseDown}
         onTouchStart={handleMouseDown}
         onMousemove={handleMouseMove}
@@ -65,13 +88,15 @@ const NewPicture = () => {
         onMouseup={handleMouseUp}
         onTouchEnd={handleMouseUp}
         style={{
-          "border": "1px solid #000", 
           "display": "inline-block",
           "margin": `10px ${(window.innerWidth - 300) / 2 - 1}px`,
           "touchAction": "none",
         }}
         ref={stageRef}
       >
+        <Layer>
+          <Rect x={0} y={0} width={300} height={400} fill="white" />
+        </Layer>
         <Layer>
           {lines.map((line, i) => (
             <Line
@@ -89,12 +114,15 @@ const NewPicture = () => {
         </Layer>
       </Stage>
       <DrawMenu 
-        color={color} changeColor={(color) => setColor(color)}
-        width={width} changeWidth={(width) => setWidth(width)}
-        tool={tool} changeTool={(tool) => setTool(tool)}
+        color={color} 
+        changeColor={(color) => setColor(color)}
+        width={width}
+        tool={tool}
+        changePen={changePen}
+        changeEraser={changeEraser}
         undo={() => handleUndo()}
       />
-    </div>
+    </NewPictureComponent>
   );
 };
 
