@@ -14,13 +14,9 @@ const FormText = styled.p`
   margin: 0;
 `;
 
-interface Values {
-  title: string;
-};
-
 interface Props {
   visible: boolean;
-  onCreate: (values: Values) => void;
+  onCreate: (title: string) => void;
   onCancel: () => void;
 };
 
@@ -42,7 +38,7 @@ const NewPictureInputModal: React.FC<Props> = (props) => {
         form.validateFields()
             .then(values => {
               form.resetFields();
-              onCreate(values);
+              onCreate(values.title);
             })
       }}
     >

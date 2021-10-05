@@ -1,4 +1,6 @@
+import React from "react";
 import styled from "styled-components";
+import { Picture } from "./types";
 
 const LastPictureComponenet = styled.div`
   text-align: center;
@@ -13,11 +15,11 @@ const LastPictureComponenet = styled.div`
   }
 `;
 
-const LastPicture = () => {
+const LastPicture: React.FC<Picture> = (props) => {
   return (
     <LastPictureComponenet>
-      <p>1枚目</p>
-      <img src={`${process.env.PUBLIC_URL}/logo192.png`} alt=""/>
+      <p>{props.order}枚目</p>
+      <img src={props.image_url} alt=""/>
     </LastPictureComponenet>
   );
 };

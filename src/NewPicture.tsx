@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { Layer, Stage, Line, Rect } from "react-konva";
+import { useParams, useHistory } from "react-router-dom";
 import Konva from "konva";
+import axios from "axios";
 import styled from "styled-components";
 import DrawMenu from "./DrawMenu";
 import NewPictureHeader from "./NewPictureHeader";
@@ -32,6 +34,8 @@ const NewPicture = () => {
   const [visible, setVisible] = useState<boolean>(false);
   const isDrawing = useRef<boolean>(false);
   const stageRef = useRef<Konva.Stage>(null);
+  const { order } = useParams<{order: string}>();
+  const history = useHistory();
 
   const handleMouseDown = (e: any) => {
     isDrawing.current = true;
@@ -69,15 +73,41 @@ const NewPicture = () => {
     setWidth(width);
   };
 
+  const createPicture = (title: string) => {
+    const stage = stageRef.current;
+    if (stage) {
+      const dataURI = stage.toDataURL();
+      const byteString = atob(dataURI.split(',')[1]);
+      const mimeType = dataURI.split(',')[0].split(':')[1].split(';')[0];
+      let buffer = new Uint8Array(byteString.length);
+      for (let i = 0; i < byteString.length; i++) {
+        buffer[i] = byteString.charCodeAt(i);
+      }
+      const blob =  new Blob([buffer], {type: mimeType});
+      const data = new FormData();
+      data.append("name", title);
+      data.append("order", order);
+      data.append("image", blob);
+      axios.post("http://localhost:3001/pictures", data, {
+        headers: {
+          'content-type': 'multipart/form-data',
+        }
+      }).then((res) => {
+        history.push("/result", { pictures: res.data });
+      });
+      setVisible(false);    
+    }
+  };
+
   return (
     <NewPictureComponent>
       <NewPictureHeader onComplete={() => setVisible(true)} />
       <NewPictureInputModal
         visible={visible}
-        onCreate={() => setVisible(false)}
+        onCreate={createPicture}
         onCancel={() => setVisible(false)}
       />
-      <p>2枚目</p>
+      <p>{order}枚目</p>
       <Stage
         width={300}
         height={400}
