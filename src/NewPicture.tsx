@@ -88,7 +88,7 @@ const NewPicture = () => {
       data.append("name", title);
       data.append("order", order);
       data.append("image", blob);
-      axios.post("http://localhost:3001/pictures", data, {
+      axios.post(`${process.env.REACT_APP_API_URL}/pictures`, data, {
         headers: {
           'content-type': 'multipart/form-data',
         }

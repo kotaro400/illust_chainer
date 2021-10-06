@@ -19,7 +19,7 @@ const Pictures = () => {
   const [pictures, setPictures] = useState<Picture[]>([]);
 
   useEffect(() => {
-    axios.get("http://localhost:3001/pictures")
+    axios.get(`${process.env.REACT_APP_API_URL}/pictures`)
       .then((res) => {
         setPictures(res.data);
       })
@@ -29,6 +29,9 @@ const Pictures = () => {
     return (
       <PicturesComponent>
         <MainHeader />
+        <Button type="primary" shape="round" size="large">
+          <Link to={`/new/1`}>絵を描く</Link>
+        </Button>
       </PicturesComponent>
     )
   }else{
