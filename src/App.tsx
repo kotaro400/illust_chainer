@@ -8,7 +8,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Route exact path="/" component={Pictures} />
-      <Route exact path="/new/:order" component={NewPicture} />
+      <Route exact path="/new/:chain/:order" component={NewPicture} />
       <Route exact path="/result" component={Result} />
     </BrowserRouter>
   );

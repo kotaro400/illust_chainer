@@ -3,4 +3,5 @@ export interface Picture {
   name?: string;
   order: number;
   image_url: string;
+  chain_id: number;
 };

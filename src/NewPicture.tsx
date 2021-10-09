@@ -34,7 +34,7 @@ const NewPicture = () => {
   const [visible, setVisible] = useState<boolean>(false);
   const isDrawing = useRef<boolean>(false);
   const stageRef = useRef<Konva.Stage>(null);
-  const { order } = useParams<{order: string}>();
+  const { order, chain } = useParams<{order: string, chain: string}>();
   const history = useHistory();
 
   const handleMouseDown = (e: any) => {
@@ -87,13 +87,18 @@ const NewPicture = () => {
       const data = new FormData();
       data.append("name", title);
       data.append("order", order);
+      data.append("chain_id", chain);
       data.append("image", blob);
       axios.post(`${process.env.REACT_APP_API_URL}/pictures`, data, {
         headers: {
           'content-type': 'multipart/form-data',
         }
       }).then((res) => {
-        history.push("/result", { pictures: res.data });
+        const resData: any = res.data;
+        history.push("/result", { pictures: resData.pictures, isChained: resData.meta.chained });
+      }).catch(() => {
+        alert("すでに誰かが回答済みです");
+        history.push("/");
       });
       setVisible(false);    
     }

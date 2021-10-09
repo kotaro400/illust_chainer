@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import { Picture } from "./types";
 
 const LastPictureComponenet = styled.div`
   text-align: center;
@@ -15,10 +14,15 @@ const LastPictureComponenet = styled.div`
   }
 `;
 
-const LastPicture: React.FC<Picture> = (props) => {
+interface LastPictureProps {
+  order: number;
+  image_url: string;
+}
+
+const LastPicture: React.FC<LastPictureProps> = (props) => {
   return (
     <LastPictureComponenet>
-      <p>{props.order}枚目</p>
+      <p>現在の絵</p>
       <img src={props.image_url} alt=""/>
     </LastPictureComponenet>
   );

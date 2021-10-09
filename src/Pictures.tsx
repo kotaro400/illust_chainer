@@ -21,7 +21,8 @@ const Pictures = () => {
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}/pictures`)
       .then((res) => {
-        setPictures(res.data);
+        const resData: { pictures: Picture[] } = res.data;
+        setPictures(resData.pictures);
       })
   }, []);
 
@@ -29,20 +30,20 @@ const Pictures = () => {
     return (
       <PicturesComponent>
         <MainHeader />
-        <Button type="primary" shape="round" size="large">
-          <Link to={`/new/1`}>絵を描く</Link>
-        </Button>
       </PicturesComponent>
     )
   }else{
     return (
       <PicturesComponent>
         <MainHeader />
-        <LastPicture id={pictures[0].id} order={pictures[0].order} image_url={pictures[0].image_url}/>
+        <LastPicture order={pictures[0].order} image_url={pictures[0].image_url}/>
         <Button type="primary" shape="round" size="large">
-          <Link to={`/new/${pictures[0].order + 1}`}>次の絵を描く</Link>
+          <Link to={`/new/${pictures[0].chain_id}/${pictures[0].order + 1}`}>次の絵を描く</Link>
         </Button>
-        <PictureHistory pictures={pictures.slice(1)} name={false}/>
+
+        {
+          pictures.length > 1 ? (<PictureHistory pictures={pictures.slice(1)} name={false}/>) : null
+        }
       </PicturesComponent>
     );  
   }
