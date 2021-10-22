@@ -23,7 +23,7 @@ const LastPicture: React.FC<LastPictureProps> = (props) => {
   return (
     <LastPictureComponenet>
       <p>現在の絵</p>
-      <img src={props.image_url} alt=""/>
+      <img src={props.image_url} alt="" />
     </LastPictureComponenet>
   );
 };

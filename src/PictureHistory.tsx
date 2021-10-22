@@ -43,17 +43,17 @@ const PictureHistory: React.FC<Props> = ({ pictures, name }) => {
     <PictureHistoryComponent>
       <p>今までの絵</p>
       <div className="pictures">
-        {pictures.map(picture => (
+        {pictures.map((picture) => (
           <div key={picture.id}>
             <p>{picture.order}枚目</p>
-            <img src={picture.image_url} alt=""/>
+            <img src={picture.image_url} alt="" />
 
-            { name ? (<p className="name">「{picture.name}」</p>) : null }   
+            {name ? <p className="name">「{picture.name}」</p> : null}
           </div>
         ))}
       </div>
     </PictureHistoryComponent>
-  )
+  );
 };
 
 export default PictureHistory;

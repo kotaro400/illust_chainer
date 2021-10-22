@@ -28,13 +28,13 @@ interface LineType {
 
 const NewPicture = () => {
   const [lines, setLines] = useState<LineType[]>([]);
-  const [tool, setTool] = useState<"pen" | "eraser">('pen');
+  const [tool, setTool] = useState<"pen" | "eraser">("pen");
   const [color, setColor] = useState<string>("#000");
   const [width, setWidth] = useState<number>(5);
   const [visible, setVisible] = useState<boolean>(false);
   const isDrawing = useRef<boolean>(false);
   const stageRef = useRef<Konva.Stage>(null);
-  const { order, chain } = useParams<{order: string, chain: string}>();
+  const { order, chain } = useParams<{ order: string; chain: string }>();
   const history = useHistory();
 
   const handleMouseDown = (e: any) => {
@@ -56,11 +56,11 @@ const NewPicture = () => {
   };
 
   const handleMouseUp = (e: any) => {
-    isDrawing.current = false;    
+    isDrawing.current = false;
   };
 
   const handleUndo = () => {
-    setLines(lines.slice(0, lines.length - 1));    
+    setLines(lines.slice(0, lines.length - 1));
   };
 
   const changePen = (width: number) => {
@@ -77,30 +77,36 @@ const NewPicture = () => {
     const stage = stageRef.current;
     if (stage) {
       const dataURI = stage.toDataURL();
-      const byteString = atob(dataURI.split(',')[1]);
-      const mimeType = dataURI.split(',')[0].split(':')[1].split(';')[0];
+      const byteString = atob(dataURI.split(",")[1]);
+      const mimeType = dataURI.split(",")[0].split(":")[1].split(";")[0];
       let buffer = new Uint8Array(byteString.length);
       for (let i = 0; i < byteString.length; i++) {
         buffer[i] = byteString.charCodeAt(i);
       }
-      const blob =  new Blob([buffer], {type: mimeType});
+      const blob = new Blob([buffer], { type: mimeType });
       const data = new FormData();
       data.append("name", title);
       data.append("order", order);
       data.append("chain_id", chain);
       data.append("image", blob);
-      axios.post(`${process.env.REACT_APP_API_URL}/pictures`, data, {
-        headers: {
-          'content-type': 'multipart/form-data',
-        }
-      }).then((res) => {
-        const resData: any = res.data;
-        history.push("/result", { pictures: resData.pictures, isChained: resData.meta.chained });
-      }).catch(() => {
-        alert("すでに誰かが回答済みです");
-        history.push("/");
-      });
-      setVisible(false);    
+      axios
+        .post(`${process.env.REACT_APP_API_URL}/pictures`, data, {
+          headers: {
+            "content-type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          const resData: any = res.data;
+          history.push("/result", {
+            pictures: resData.pictures,
+            isChained: resData.meta.chained,
+          });
+        })
+        .catch(() => {
+          alert("すでに誰かが回答済みです");
+          history.push("/");
+        });
+      setVisible(false);
     }
   };
 
@@ -123,9 +129,9 @@ const NewPicture = () => {
         onMouseup={handleMouseUp}
         onTouchEnd={handleMouseUp}
         style={{
-          "display": "inline-block",
-          "margin": `10px ${(window.innerWidth - 300) / 2 - 1}px`,
-          "touchAction": "none",
+          display: "inline-block",
+          margin: `10px ${(window.innerWidth - 300) / 2 - 1}px`,
+          touchAction: "none",
         }}
         ref={stageRef}
       >
@@ -142,14 +148,14 @@ const NewPicture = () => {
               tension={0.5}
               lineCap="round"
               globalCompositeOperation={
-                line.tool === 'eraser' ? 'destination-out' : 'source-over'
+                line.tool === "eraser" ? "destination-out" : "source-over"
               }
             />
           ))}
         </Layer>
       </Stage>
-      <DrawMenu 
-        color={color} 
+      <DrawMenu
+        color={color}
         changeColor={(color) => setColor(color)}
         width={width}
         tool={tool}

@@ -2,7 +2,7 @@ import { BrowserRouter, Route } from "react-router-dom";
 import Pictures from "./Pictures";
 import NewPicture from "./NewPicture";
 import Result from "./Result";
-import './App.css';
+import "./App.css";
 
 const App = () => {
   return (

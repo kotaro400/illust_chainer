@@ -4,4 +4,4 @@ export interface Picture {
   order: number;
   image_url: string;
   chain_id: number;
-};
+}
