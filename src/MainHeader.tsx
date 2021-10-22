@@ -8,6 +8,7 @@ const headerStyle: React.CSSProperties = {
 const MainHeader = () => {
   return (
     <header style={headerStyle}>
+      <img src={`${process.env.PUBLIC_URL}/logo.png`} alt="" />
     </header>
   );
 };
