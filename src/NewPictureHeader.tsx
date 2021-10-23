@@ -10,6 +10,7 @@ const NewPictureHeaderComponent = styled.header`
   align-items: center;
   justify-content: flex-end;
   padding: 10px 60px 10px 10px;
+  position: relative;
 `;
 
 interface Props {
