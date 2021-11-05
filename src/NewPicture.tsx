@@ -1,9 +1,23 @@
 import { useRef, useState } from "react";
-import { Layer, Stage, Line } from "react-konva";
+import { Layer, Stage, Line, Rect } from "react-konva";
+import { useParams, useHistory } from "react-router-dom";
 import Konva from "konva";
+import axios from "axios";
+import styled from "styled-components";
 import DrawMenu from "./DrawMenu";
 import NewPictureHeader from "./NewPictureHeader";
 import NewPictureInputModal from "./NewPictureInputModal";
+
+const NewPictureComponent = styled.div`
+  background-color: #f8f8fa;
+  min-height: 100vh;
+  p {
+    font-size: 24px;
+    text-align: center;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+`;
 
 interface LineType {
   points: number[];
@@ -14,12 +28,14 @@ interface LineType {
 
 const NewPicture = () => {
   const [lines, setLines] = useState<LineType[]>([]);
-  const [tool, setTool] = useState<"pen" | "eraser">('pen');
+  const [tool, setTool] = useState<"pen" | "eraser">("pen");
   const [color, setColor] = useState<string>("#000");
   const [width, setWidth] = useState<number>(5);
   const [visible, setVisible] = useState<boolean>(false);
   const isDrawing = useRef<boolean>(false);
   const stageRef = useRef<Konva.Stage>(null);
+  const { order, chain } = useParams<{ order: string; chain: string }>();
+  const history = useHistory();
 
   const handleMouseDown = (e: any) => {
     isDrawing.current = true;
@@ -40,24 +56,72 @@ const NewPicture = () => {
   };
 
   const handleMouseUp = (e: any) => {
-    isDrawing.current = false;    
+    isDrawing.current = false;
   };
 
   const handleUndo = () => {
-    setLines(lines.slice(0, lines.length - 1));    
+    setLines(lines.slice(0, lines.length - 1));
+  };
+
+  const changePen = (width: number) => {
+    setTool("pen");
+    setWidth(width);
+  };
+
+  const changeEraser = (width: number) => {
+    setTool("eraser");
+    setWidth(width);
+  };
+
+  const createPicture = (title: string) => {
+    const stage = stageRef.current;
+    if (stage) {
+      const dataURI = stage.toDataURL();
+      const byteString = atob(dataURI.split(",")[1]);
+      const mimeType = dataURI.split(",")[0].split(":")[1].split(";")[0];
+      let buffer = new Uint8Array(byteString.length);
+      for (let i = 0; i < byteString.length; i++) {
+        buffer[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([buffer], { type: mimeType });
+      const data = new FormData();
+      data.append("name", title);
+      data.append("order", order);
+      data.append("chain_id", chain);
+      data.append("image", blob);
+      axios
+        .post(`${process.env.REACT_APP_API_URL}/pictures`, data, {
+          headers: {
+            "content-type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          const resData: any = res.data;
+          history.push("/result", {
+            pictures: resData.pictures,
+            isChained: resData.meta.chained,
+          });
+        })
+        .catch(() => {
+          alert("すでに誰かが回答済みです");
+          history.push("/");
+        });
+      setVisible(false);
+    }
   };
 
   return (
-    <div>
+    <NewPictureComponent>
       <NewPictureHeader onComplete={() => setVisible(true)} />
       <NewPictureInputModal
         visible={visible}
-        onCreate={() => setVisible(false)}
+        onCreate={createPicture}
         onCancel={() => setVisible(false)}
       />
+      <p>{order}枚目</p>
       <Stage
         width={300}
-        height={450}
+        height={400}
         onMouseDown={handleMouseDown}
         onTouchStart={handleMouseDown}
         onMousemove={handleMouseMove}
@@ -65,13 +129,15 @@ const NewPicture = () => {
         onMouseup={handleMouseUp}
         onTouchEnd={handleMouseUp}
         style={{
-          "border": "1px solid #000", 
-          "display": "inline-block",
-          "margin": `10px ${(window.innerWidth - 300) / 2 - 1}px`,
-          "touchAction": "none",
+          display: "inline-block",
+          margin: `10px ${(window.innerWidth - 300) / 2 - 1}px`,
+          touchAction: "none",
         }}
         ref={stageRef}
       >
+        <Layer>
+          <Rect x={0} y={0} width={300} height={400} fill="white" />
+        </Layer>
         <Layer>
           {lines.map((line, i) => (
             <Line
@@ -82,19 +148,22 @@ const NewPicture = () => {
               tension={0.5}
               lineCap="round"
               globalCompositeOperation={
-                line.tool === 'eraser' ? 'destination-out' : 'source-over'
+                line.tool === "eraser" ? "destination-out" : "source-over"
               }
             />
           ))}
         </Layer>
       </Stage>
-      <DrawMenu 
-        color={color} changeColor={(color) => setColor(color)}
-        width={width} changeWidth={(width) => setWidth(width)}
-        tool={tool} changeTool={(tool) => setTool(tool)}
+      <DrawMenu
+        color={color}
+        changeColor={(color) => setColor(color)}
+        width={width}
+        tool={tool}
+        changePen={changePen}
+        changeEraser={changeEraser}
         undo={() => handleUndo()}
       />
-    </div>
+    </NewPictureComponent>
   );
 };
 
